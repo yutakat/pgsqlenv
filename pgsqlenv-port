@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+if [ "$FLAG_ALL" = "1" ];
+then
+VALS=`ls -1 $PGSQLENV_VERSION_INSTALL_DIR`
+else
+VALS=$1
+fi
+
+for i in $VALS
+do
+PREFIX=$PGSQLENV_VERSION_INSTALL_DIR/$i
+PGCONF=$PREFIX/data/postgresql.conf
+
+printf '%-8s :' $i
+if [ -e $PGCONF ]
+then
+	(egrep '^#?port\s*=' $PGCONF  | perl -pe 's/^#?port\s*=\s*(\d+).*$/$1/;' ) || echo 5432\(default\)
+else
+        echo "Not initalized"
+fi
+
+done
+

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+VERSION=$1
+PREFIX=$PGSQLENV_VERSION_INSTALL_DIR/$1
+
+export PGDATA=$PREFIX/data
+INITDB=$PREFIX/bin/initdb
+PG_CTL=$PREFIX/bin/pg_ctl
+shift
+
+printf '%-8s : ' $VERSION
+if [ -x $INITDB ]; then 
+  if [ -d $PGDATA ] ; then
+    if [ "$FLAG_FORCE" = "1" ] ; then
+      $PG_CTL -m immediate stop
+      rm -fr $PGDATA
+      ($INITDB $* >$PREFIX/initdb.log 2>&1 && echo initdb completed ) || echo initdb failed.
+    else
+      echo Already initialized
+    fi
+  else
+    ($INITDB $* >$PREFIX/initdb.log 2>&1 && echo initdb completed ) || echo initdb failed
+  fi
+else
+     echo Not Installed
+fi

@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+if [ "$FLAG_ALL" = "1" ];
+then
+VALS=`ls -1 $PGSQLENV_VERSION_INSTALL_DIR`
+else
+VALS=$1
+fi
+
+for i in $VALS
+do
+PREFIX=$PGSQLENV_VERSION_INSTALL_DIR/$i
+
+export PGDATA=$PREFIX/data
+PGCTL=$PREFIX/bin/pg_ctl
+
+echo -n $i ":  "
+if [ -x $PGCTL ]
+then
+        if [ -d $PGDATA ] ; then
+                ($PGCTL restart >/dev/null 2>&1 && echo "OK" ) || echo "FAILED"
+        else
+                echo "Not initialized"
+        fi
+else
+        echo "Not installed"
+fi
+
+done
+

@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+URL=ftp://ftp.postgresql.org/pub/source/v$1/postgresql-$1.tar.bz2
+MD5URL=$URL.md5
+SRCDIR=$PGSQLBUILD_PATH
+DIR=postgresql-$1
+FILENAME=postgresql-$1.tar.bz2
+MD5FILENAME=$FILENAME.md5
+PREFIX=$PGSQLENV_VERSION_INSTALL_DIR/$1
+cd $SRCDIR
+
+if [ -d $PREFIX ] ; then
+	if [ "$FLAG_FORCE" = "1" ] ; then
+		pgsqlenv -f uninstall $1
+	else
+		echo Already installed.
+		exit 1
+	fi
+fi
+
+if [ ! -d $SRCDIR ] 
+then
+mkdir $SRCDIR
+fi
+
+echo -n downloading...
+if [ -e $FILENAME ] 
+then
+( wget -q -O - $MD5URL | md5sum --status -c ) || ( rm -f $FILENAME ; wget -q $URL ) 
+else
+wget -q $URL
+fi
+
+(tar xjf $FILENAME && echo OK ) || (echo FAILED && exit 1)
+cd $SRCDIR/$DIR
+(echo -n configuring... ; ./configure prefix=$PREFIX >configure.log 2>&1 && echo DONE ) || echo FAILED
+(echo -n building... ; make >make.log  2>&1 && echo DONE ) || echo FAILED
+(echo -n regression test... ; make check >make_check.log  2>&1 && echo DONE ) || echo FAILED
+(echo -n installing...; make install >>make_install.log  2>&1 && echo DONE ) || echo FAILED
+cd contrib
+(echo -n building contrib... ; make >make.log  2>&1 && echo DONE ) || echo FAILED
+(echo -n installing contrib...; make install >>make_install.log  2>&1 && echo DONE ) || echo FAILED
+

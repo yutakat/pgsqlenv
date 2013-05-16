@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+PREFIX=$PGSQLENV_VERSION_INSTALL_DIR/$1
+export PGPORT=$2
+export PGDATA=$PREFIX/data
+PGCONF=$PGDATA/postgresql.conf
+
+printf '%-8s :' $1
+if [ -e $PGCONF ]
+then
+	(perl -i.bak -pe 's/^#?port\s*=\s*(\d+)(.*)$/port=$ENV{PGPORT}$2/;' $PGCONF ) || echo port=$PGPORT >>$PGCONF
+	(grep -q "^port\s*=\s*${PGPORT}" $PGCONF && echo $PGPORT ) || echo FAILED
+else
+        echo "Not initalized"
+fi
+
+

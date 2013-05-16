@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+if [ "$FLAG_ALL" = "1" ];
+then
+VALS=`ls -1 $PGSQLENV_VERSION_INSTALL_DIR`
+else
+VALS=$1
+fi
+
+
+if [ "$FLAG_FORCE" = "1" ] ; then
+	PGCTL_OPTS="-m i stop"
+else
+	PGCTL_OPTS=stop
+fi
+
+for i in $VALS
+do
+PREFIX=$PGSQLENV_VERSION_INSTALL_DIR/$i
+
+export PGDATA=$PREFIX/data
+PGCTL=$PREFIX/bin/pg_ctl
+
+printf '%-8s :' $i
+if [ -x $PGCTL ] ; then
+	if [ -d $PGDATA ] ; then
+		if [ -e $PGDATA/postmaster.pid ]; then
+        		($PGCTL $PGCTL_OPTS >/dev/null 2>&1 && echo "OK" ) || echo "FAILED"
+		else
+			echo "Not Running"
+		fi
+        else
+		echo "Not initailzed"
+	fi
+else
+        echo "Not installed"
+fi
+
+done
+

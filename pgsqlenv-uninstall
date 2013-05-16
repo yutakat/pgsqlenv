@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+VERSION=$1
+PREFIX=$PGSQLENV_VERSION_INSTALL_DIR/$1
+
+export PGDATA=$PREFIX/data
+PG_CTL=$PREFIX/bin/pg_ctl
+shift
+
+printf '%-8s : ' $VERSION
+if [ -d $PREFIX ]; then 
+  if [ -d $PGDATA ] ; then
+    if [ "$FLAG_FORCE" = "1" ] ; then
+      $PG_CTL -m immediate stop
+      (rm -fr $PREFIX && echo Uninstalled ) || echo FAILED
+    else
+      echo Already initialized. 
+    fi
+  else
+    (rm -fr $PREFIX && echo Uninstalled ) || echo FAILED
+  fi
+else
+     echo Not Installed
+fi

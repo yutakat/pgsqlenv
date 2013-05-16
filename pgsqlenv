@@ -1,0 +1,50 @@
+#!/bin/bash
+
+shopt -s nullglob
+
+if [ -z ${PGSQLENV_ROOT} ]; then
+PGSQLENV_ROOT=${HOME}/.pgsqlenv
+else
+PGSQLENV_ROOT=${PGSQLENV_ROOT%/}
+fi
+export PGSQLENV_ROOT
+
+if [ -z ${PGSQLENV_VERSION_INSTALL_DIR} ]; then
+PGSQLENV_VERSION_INSTALL_DIR=${PGSQLENV_ROOT}/versions
+else
+PGSQLENV_VERSION_INSTALL_DIR=${PGSQLENV_VERSION_INSTALL_DIR%/}
+fi
+export PGSQLENV_VERSION_INSTALL_DIR
+
+if [ -z ${PGSQLBUILD_PATH} ]; then
+   PGSQLBUILD_PATH=${PGSQLENV_ROOT}/pgsql-build
+fi
+export PGSQLBUILD_PATH
+
+while getopts "af" opt
+do
+case $opt in
+    a)
+      export FLAG_ALL="1"
+      ;;
+    f)
+      export FLAG_FORCE="1"
+      ;;
+  esac
+done
+
+shift `expr $OPTIND - 1`
+command="$1"
+
+case "$command" in
+  * )
+  command_path="$(command -v "pgsqlenv-$command" || true)"
+    if [ -z "$command_path" ]; then
+echo "pgsqlenv: no such command `$command`" >&2
+    exit 1
+  fi
+
+shift 1
+  exec "$command_path" "$@"
+  ;;
+esac
