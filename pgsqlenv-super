@@ -20,7 +20,7 @@ if [ -e $PGCONF ]
 then
         ( 
            PGPORT=`egrep '^#?port\s*=' $PGCONF  | perl -pe 's/^#?port\s*=\s*(\d+).*$/$1/;'`
-	   ( $PSQL -q  -p $PGPORT -t -c "select 'OK'" | sed -e '/^$/d' ) || (
+	   ( $PSQL -q  -p $PGPORT -t -c "select 'OK'" postgres | sed -e '/^$/d') || (
 	   $CREATEUSER -p $PGPORT -s `whoami`
 	   $CREATEDB -p $PGPORT
 	   echo DONE 
