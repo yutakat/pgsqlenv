@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+VERSION=$1 
+shift
+PREFIX=$PGSQLENV_VERSION_INSTALL_DIR/$VERSION
+PGCONF=$PREFIX/data/postgresql.conf
+CMD=$PREFIX/bin/$1
+shift
+
+if [ -e $PGCONF ]
+then
+           PGPORT=`egrep '^#?port\s*=' $PGCONF  | perl -pe 's/^#?port\s*=\s*(\d+).*$/$1/;'`
+	   $CMD -p $PGPORT $* || echo $VERSION : Not Running?
+else
+        echo "$VERSION : Not initalized"
+fi
+
+
