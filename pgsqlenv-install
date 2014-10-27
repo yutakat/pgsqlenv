@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-URL=ftp://ftp.postgresql.org/pub/source/v$1/postgresql-$1.tar.bz2
+URL=http://ftp.postgresql.org/pub/source/v$1/postgresql-$1.tar.bz2
 MD5URL=$URL.md5
 SRCDIR=$PGSQLBUILD_PATH
 DIR=postgresql-$1
